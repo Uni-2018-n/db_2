@@ -236,102 +236,109 @@ int SHT_SecondaryGetAllEntries(SHT_info header_info_sht, HT_info header_info_ht,
   else
     return block_counter + result;
 }
-//
-// int HashStatistics(char* filename){
-//   HT_info* header_info = HT_OpenIndex(filename);
-//
-//   int numBuckets =header_info->numBuckets;
-//   int pl_blocks = (numBuckets / MAX_BUCKETS_IN_BLOCK)+ 1;
-//   int block_counter=1 + pl_blocks;//the block counter starts with one because we have the header block, and then we add the pl of blocks used by the hash table
-//
-//   int array[numBuckets];//initialize this array so we can easily store the heap's addresses
-//
-//   void* block;
-//   int heap;
-//   int j;
-//   int i;
-//   int counter=0;
-//
-//   for(i=0;i<pl_blocks;i++){//as above for each block read it and go through its buckets
-//     if(BF_ReadBlock(header_info->fileDesc, i+1, &block) <0){
-//       return -1;
-//     }
-//
-//     int max;
-//     heap=0;
-//     if(i == pl_blocks-1){
-//       max = header_info->numBuckets - MAX_BUCKETS_IN_BLOCK*i;
-//     }else{
-//       max = MAX_BUCKETS_IN_BLOCK;
-//     }
-//     for(j=0;j<max;j++){
-//         memcpy(&heap, (char *)block + sizeof(int)*j, sizeof(int));
-//         array[counter] = heap;//store the heap into the array
-//       counter++;
-//     }
-//   }
-//
-//   //we used an array here because inside HT_HP_* functions we have BF_ReadBlock function that changes the void* block data so its not possible for us to have the correct one
-//   int k=0;
-//   while(array[k] == 0){
-//     k++;
-//   }
-//   int temp = HT_HP_GetRecordCounter(header_info, array[k]);
-//   int min = temp;//help variables to calculate min, max and averages
-//   int max = temp;
-//   int average_records = 0;
-//   int average_blocks = 0;
-//   for(int i=0;i< numBuckets; i++){//for every bucket do every calculation to find the output
-//     heap = array[i];
-//     if(heap == 0){//if its 0 then we have an unused heap so skip it
-//       continue;
-//     }
-//     int num = HT_HP_GetBlockCounter(header_info, heap);//here it goes into infinite loop
-//
-//     int pl_records = HT_HP_GetRecordCounter(header_info, heap);
-//
-//     block_counter += num;
-//
-//     if(pl_records < min){
-//       min = pl_records;
-//     }
-//     if(pl_records > max){
-//       max = pl_records;
-//     }
-//     average_blocks += num;
-//     average_records += pl_records;
-//
-//   }
-//   average_blocks = average_blocks/numBuckets;
-//   average_records = average_records/numBuckets;
-//
-//   //and print it
-//   cout << "Blocks used by file \"" << filename << "\": " << block_counter << endl;
-//   cout << "Minimum records per bucket: " << min << endl;
-//   cout << "Maximum records per bucket: " << max << endl;
-//   cout << "Average records per bucket: " << average_records << endl;
-//
-//   cout << "Average number of blocks per bucket: " << average_blocks << endl;
-//
-//
-//   cout << "Overflow blocks: " << endl;//same thing with overflow
-//   int overflow=0;
-//   for(int i=0;i<numBuckets;i++){
-//     int heap;
-//     heap = array[i];
-//     int num = HT_HP_GetBlockCounter(header_info, heap);
-//     if(num > 1){//if the num is > 1 it means that there is an overflow happening
-//       overflow += num-1;
-//       cout << "For bucket " << i << ", " << num-1 << endl;
-//     }
-//   }
-//   cout << "Overflow sum: " << overflow << endl;
-//
-//   if(HT_CloseIndex(header_info) <0){
-//     return -1;
-//   }
-//   return 0;
-// }
+
+int SHT_HashStatistics(char* filename){
+  SHT_info* header_info_sht = SHT_OpenSecondaryIndex(filename);
+  HT_info* header_info_ht = HT_OpenIndex(header_info_sht->fileName);
+
+  int numBuckets =header_info_sht->numBuckets;
+  int pl_blocks = (numBuckets / MAX_BUCKETS_IN_BLOCK)+ 1;
+  int block_counter=1 + pl_blocks;//the block counter starts with one because we have the header block, and then we add the pl of blocks used by the hash table
+
+  int array[numBuckets];//initialize this array so we can easily store the heap's addresses
+
+  void* block;
+  int heap;
+  int j;
+  int i;
+  int counter=0;
+
+  for(i=0;i<pl_blocks;i++){//as above for each block read it and go through its buckets
+    if(BF_ReadBlock(header_info_sht->fileDesc, i+1, &block) <0){
+      return -1;
+    }
+
+    int max;
+    heap=0;
+    if(i == pl_blocks-1){
+      max = header_info_sht->numBuckets - MAX_BUCKETS_IN_BLOCK*i;
+    }else{
+      max = MAX_BUCKETS_IN_BLOCK;
+    }
+    for(j=0;j<max;j++){
+        memcpy(&heap, (char *)block + sizeof(int)*j, sizeof(int));
+        array[counter] = heap;//store the heap into the array
+      counter++;
+    }
+  }
+
+  //we used an array here because inside HT_HP_* functions we have BF_ReadBlock function that changes the void* block data so its not possible for us to have the correct one
+  int k=0;
+  while(array[k] == 0){
+    k++;
+  }
+  int temp = SHT_HP_GetRecordCounter(header_info_sht, array[k]);
+  int min = temp;//help variables to calculate min, max and averages
+  int max = temp;
+  int average_records = 0;
+  int average_blocks = 0;
+  for(int i=0;i< numBuckets; i++){//for every bucket do every calculation to find the output
+    heap = array[i];
+    if(heap == 0){//if its 0 then we have an unused heap so skip it
+      continue;
+    }
+    int num = SHT_HP_GetBlockCounter(header_info_sht, heap);//here it goes into infinite loop
+    int pl_records = SHT_HP_GetRecordCounter(header_info_sht, heap);
+
+    block_counter += num;
+
+    if(pl_records < min){
+      min = pl_records;
+    }
+    if(pl_records > max){
+      max = pl_records;
+    }
+    average_blocks += num;
+    average_records += pl_records;
+
+  }
+  cout << average_blocks <<  " " << numBuckets<< endl;
+  average_blocks = average_blocks/numBuckets;
+  average_records = average_records/numBuckets;
+
+  //and print it
+  cout << "Blocks used by file \"" << filename << "\": " << block_counter << endl;
+  cout << "Minimum records per bucket: " << min << endl;
+  cout << "Maximum records per bucket: " << max << endl;
+  cout << "Average records per bucket: " << average_records << endl;
+
+  cout << "Average number of blocks per bucket: " << average_blocks << endl;
+
+
+  cout << "Overflow blocks: " << endl;//same thing with overflow
+  int overflow=0;
+  for(int i=0;i<numBuckets;i++){
+    int heap;
+    heap = array[i];
+    int num = SHT_HP_GetBlockCounter(header_info_sht, heap);
+    if(num > 1){//if the num is > 1 it means that there is an overflow happening
+      overflow += num-1;
+      cout << "For bucket " << i << ", " << num-1 << endl;
+    }
+  }
+  cout << "Overflow sum: " << overflow << endl;
+
+
+  if(HT_CloseIndex(header_info_ht) <0){
+    return -1;
+  }
+
+  if(SHT_CloseSecondaryIndex(header_info_sht) < 0){
+    return -1;
+  }
+
+  return 0;
+}
 
 
 

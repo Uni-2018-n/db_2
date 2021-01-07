@@ -13,4 +13,7 @@ int SHT_AssignKeyToRecord(SecondaryRecord* record, void* value);
 int SHT_HP_GetAllEntries(HT_info* header_info, void* value, int heap_addr);
 int SHT_AssignKeyToRecord_T(Record* record, void* value);
 int SHT_IsKeyInBlock_T(Record* record, void* block);
+
+int SHT_HP_GetRecordCounter(SHT_info* header_info, int heap_addr);
+int SHT_HP_GetBlockCounter(SHT_info* header_info, int heap_addr);
 #endif

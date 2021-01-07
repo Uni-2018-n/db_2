@@ -226,3 +226,48 @@ int SHT_HP_GetAllEntries(HT_info* header_info, void* value, int heap_addr)
 	}
 	return -1;
 }
+
+int SHT_HP_GetRecordCounter(SHT_info* header_info, int heap_addr)
+{
+	if (heap_addr == 0){
+		return -1;
+	}
+
+	void* block;
+	int curr_block_addr = heap_addr;
+	int counter = 0; // Counts how many records there are in a heap.
+
+	while (curr_block_addr != -1)
+	{
+		if (BF_ReadBlock(header_info->fileDesc, curr_block_addr, &block) < 0)
+			return -1;
+
+		counter += ReadNumOfRecords(block);
+
+    	curr_block_addr = ReadNextBlockAddr(block);
+	}
+
+	return counter;
+}
+
+int SHT_HP_GetBlockCounter(SHT_info* header_info, int heap_addr)
+{
+  if (heap_addr == 0)
+    return -1;
+
+	void* block;
+	int curr_block_addr = heap_addr;
+  	int counter = 0; // Counts how many blocks there are in a heap.
+
+  while (curr_block_addr != -1)
+	{
+		if (BF_ReadBlock(header_info->fileDesc, curr_block_addr, &block) != 0)
+			return -1;
+
+		counter++;
+
+    	curr_block_addr = ReadNextBlockAddr(block);
+	}
+
+	return counter;
+}

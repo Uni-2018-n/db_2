@@ -30,5 +30,6 @@ int SHT_CloseSecondaryIndex(SHT_info* header_info);
 
 int SHT_SecondaryInsertEntry(SHT_info header_info, SecondaryRecord record);
 int SHT_SecondaryGetAllEntries(SHT_info header_info_sht, HT_info header_info_ht, void *value);
+int SHT_HashStatistics(char* filename);
 // int HT_function(char* value, int buckets);
 #endif // __SHT_H__
