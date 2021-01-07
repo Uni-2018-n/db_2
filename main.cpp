@@ -3,6 +3,7 @@
 #include "HT.h"
 #include <cstring>
 #include "BF.h"
+#include "SHT.h"
 
 #define NUM_OF_ENTRIES 1000
 
@@ -19,7 +20,7 @@ int main(){
 		sprintf(items[i].address, "address_%d", i);
 	}
 
-	char my_db[15] = "my_db";
+	char my_db[15] = "my_db_primary";
 	HT_CreateIndex(my_db, 'i', "id", 14, 126+8);
 
 	HT_info* index = HT_OpenIndex(my_db);
