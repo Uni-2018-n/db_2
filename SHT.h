@@ -3,13 +3,12 @@
 
 #include "Record.h"
 
-#define MAX_ATTR_NAME_SIZE 15
 #define MAX_FILE_NAME_SIZE 30
 
 struct SHT_info
 {
     int fileDesc;
-    char attrName[MAX_ATTR_NAME_SIZE];
+    char* attrName;
     int attrLength;
     long int numBuckets;
     char fileName[MAX_FILE_NAME_SIZE];
