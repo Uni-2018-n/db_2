@@ -28,8 +28,6 @@ int SHT_CreateSecondaryIndex(char* sfileName, char* attrName, int attrLength, in
   if (strcmp(type, "HT") != 0)
       return -1;
 
-  // TODO: Read stuff from the old file here.
-
   BF_Init();
 
   if (BF_CreateFile(sfileName) < 0){
@@ -132,7 +130,7 @@ int SHT_CloseSecondaryIndex(SHT_info* header_info){
 }
 
 int SHT_SecondaryInsertEntry(SHT_info header_info, SecondaryRecord record){
-  int h = HT_function(record.record.surname, header_info.numBuckets);
+  int h = HT_function(record.surname, header_info.numBuckets);
   void* block;
   int heap;
   int j;
@@ -334,8 +332,9 @@ int SHT_HP_GetAllEntries(SHT_info* header_info_sht, HT_info* header_info_ht, voi
 		if (BF_ReadBlock(header_info_sht->fileDesc, curr_block_addr, &block) != 0)
 			return -1;
 
-    // if (AssignKeyToRecord(&record, value, header_info->attrType) != 0)
-		// 	return 1; //check this if we need this or not to find the secondaryrecord(so we can get the primary record's blockID)
+    if (AssignKeyToRecord(&record, value) != 0)
+			return 1; //check this if we need this or not to find the secondaryrecord(so we can get the primary record's blockID)
+
 
 		int record_pos = IsKeyInBlock(&record, block);
 		if (record_pos > -1)
@@ -363,7 +362,7 @@ int IsKeyInBlock(SecondaryRecord* record, void* block)
 	{
 		ReadRecord(block, i, &tmp_record);
 
-    if(strcmp(record->record.surname, tmp_record.surname) == 0){
+    if(strcmp(record->surname, tmp_record.surname) == 0){
       return i;
     }
 	}
@@ -378,6 +377,12 @@ void WriteRecord(void* block, int recordNumber, const SecondaryRecord* record)
 void ReadRecord(void* block, int recordNumber, SecondaryRecord* record)
 {
 	memcpy(record, (char *)block + recordNumber * sizeof(Record), sizeof(Record));
+}
+
+int AssignKeyToRecord(SecondaryRecord* record, void* value)
+{
+  strcpy(record->surname, (char *)value);
+	return 0;
 }
 
 int HT_function(char* value, int buckets){//same as int but for characters

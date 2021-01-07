@@ -18,7 +18,7 @@ struct SHT_info
 
 struct SecondaryRecord
 {
-    Record record;
+    char surname[25];
     int blockId;
 };
 
@@ -37,4 +37,5 @@ int SHT_HP_GetAllEntries(SHT_info* header_info_sht, HT_info* header_info_ht, voi
 int IsKeyInBlock(SecondaryRecord* record, void* block);
 void WriteRecord(void* block, int recordNumber, const SecondaryRecord* record);
 void ReadRecord(void* block, int recordNumber, SecondaryRecord* record);
+int AssignKeyToRecord(SecondaryRecord* record, void* value);
 #endif // __SHT_H__
