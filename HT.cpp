@@ -143,7 +143,7 @@ int HT_InsertEntry(HT_info header_info, Record record){
     memcpy((char*)block +sizeof(int)*j, &new_heap_addr, sizeof(int));
     BF_WriteBlock(header_info.fileDesc, i+1); //and save changed
   }
-  return 0;
+  return new_heap_addr;//TODO: add this to readme
 }
 
 int HT_DeleteEntry(HT_info header_info, void *value){
@@ -242,7 +242,7 @@ int HT_GetAllEntries(HT_info header_info, void *value){
   //call the function to print the entry and return the blocks searched to find the entry.
   int result = HT_HP_GetAllEntries(&header_info, value, heap);
 
-  if (result == -1) 
+  if (result == -1)
     return -1;
 
   else

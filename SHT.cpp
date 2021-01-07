@@ -371,12 +371,12 @@ int IsKeyInBlock(SecondaryRecord* record, void* block)
 
 void WriteRecord(void* block, int recordNumber, const SecondaryRecord* record)
 {
-	memcpy((char *)block + recordNumber * sizeof(Record), record, sizeof(Record));
+	memcpy((char *)block + recordNumber * sizeof(SecondaryRecord), record, sizeof(SecondaryRecord));
 }
 
 void ReadRecord(void* block, int recordNumber, SecondaryRecord* record)
 {
-	memcpy(record, (char *)block + recordNumber * sizeof(Record), sizeof(Record));
+	memcpy(record, (char *)block + recordNumber * sizeof(SecondaryRecord), sizeof(SecondaryRecord));
 }
 
 int AssignKeyToRecord(SecondaryRecord* record, void* value)

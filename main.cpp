@@ -61,26 +61,6 @@ int main(){
 		}
 	}
 
-	// Delete the entries.
-	for (auto entry : entries_to_delete)
-	{
-		if (HT_DeleteEntry(*index, &entry) == -1)
-		{
-			cout << "There was an error in the deletion of the entry: " << entry;
-			return 1;
-		}
-	}
-
-	// Check if any of the deleted entries exist.
-	for (auto entry : entries_to_delete)
-	{
-		if (HT_GetAllEntries(*index, &entry) != -1)
-		{
-			cout << "The entry: " << entry << " was found." << endl;
-			return 1;
-		}
-	}
-
 	if(HashStatistics(my_db)<0){
 		cout << "Hash returned error" << endl;
 		return -1;
