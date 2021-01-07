@@ -98,6 +98,12 @@ SHT_info* SHT_OpenSecondaryIndex(char* sfileName)
 
 int SHT_CloseSecondaryIndex(SHT_info* header_info)
 {
+    if (BF_CloseFile(header_info->fileDesc) != 0)
+        return -1;
+    
+    delete header_info->attrName;
+    delete header_info;
+
     return 0;
 }
 
