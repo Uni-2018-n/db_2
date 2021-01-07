@@ -22,7 +22,7 @@ struct SecondaryRecord
     int blockId;
 };
 
-int SHT_CreateSecondaryIndex(char* sfileName, char* attrName, int attrLength, int buckets, char* fileName);
+int SHT_CreateSecondaryIndex(const char* sfileName, const char* attrName, int attrLength, int buckets, const char* fileName);
 
 SHT_info* SHT_OpenSecondaryIndex(char* sfileName);
 

@@ -8,7 +8,7 @@
 #define MAX_BUCKETS_IN_BLOCK ((BLOCK_SIZE - 2 * (int) sizeof(int)) / (int) sizeof(int))
 #define MAX_RECORDS_IN_BLOCK ((BLOCK_SIZE - 2 * (int) sizeof(int)) / (int) sizeof(SecondaryRecord))
 
-int SHT_CreateSecondaryIndex(char* sfileName, char* attrName, int attrLength, int buckets, char* fileName){
+int SHT_CreateSecondaryIndex(const char* sfileName, const char* attrName, int attrLength, int buckets, const char* fileName){
   if (strlen(sfileName) > MAX_NAME_SIZE - 1 || strlen(fileName) > MAX_NAME_SIZE - 1){
     return -1;
   }
