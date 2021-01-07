@@ -2,6 +2,7 @@
 #include "BF.h"
 #include <cstring>
 #include <iostream>
+using namespace std;
 
 #define MAX_RECORDS_IN_BLOCK ((BLOCK_SIZE - 2 * (int) sizeof(int)) / (int) sizeof(Record))
 
@@ -389,7 +390,7 @@ int HT_HP_GetAllEntries(HT_info* header_info, void* value, int heap_addr)
 
     curr_block_addr = ReadNextBlockAddr(block);
 	}
-
+	cout << "got nothing" << endl;
 	return -1;
 }
 
@@ -560,4 +561,5 @@ int HT_HP_InsertEntry(HT_info* header_info, Record* record, int heap_address)
 	}
 
 	return heap_address;
+	// return curr_block_addr;
 }

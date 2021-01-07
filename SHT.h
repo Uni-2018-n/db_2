@@ -12,7 +12,7 @@ struct SHT_info
     int fileDesc;
     int attrLength;
     char attrName[MAX_NAME_SIZE];
-    long int numBuckets;
+    int numBuckets;
     char fileName[MAX_NAME_SIZE];
 };
 
@@ -29,13 +29,6 @@ SHT_info* SHT_OpenSecondaryIndex(char* sfileName);
 int SHT_CloseSecondaryIndex(SHT_info* header_info);
 
 int SHT_SecondaryInsertEntry(SHT_info header_info, SecondaryRecord record);
-
-int HT_function(char* value, long int buckets);
-int SHT_HP_InsertEntry(SHT_info* header_info, SecondaryRecord* record, int heap_address);
-int SHT_HP_GetAllEntries(SHT_info* header_info_sht, HT_info* header_info_ht, void* value, int heap_addr);
-
-int IsKeyInBlock(SecondaryRecord* record, void* block);
-void WriteRecord(void* block, int recordNumber, const SecondaryRecord* record);
-void ReadRecord(void* block, int recordNumber, SecondaryRecord* record);
-int AssignKeyToRecord(SecondaryRecord* record, void* value);
+int SHT_SecondaryGetAllEntries(SHT_info header_info_sht, HT_info header_info_ht, void *value);
+// int HT_function(char* value, int buckets);
 #endif // __SHT_H__

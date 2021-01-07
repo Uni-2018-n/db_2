@@ -20,11 +20,13 @@ int main(){
 		sprintf(items[i].address, "address_%d", i);
 	}
 
-	char my_db[15] = "my_db_primary";
+	char my_db[15] = "my_dbp";
 	HT_CreateIndex(my_db, 'i', "id", 14, 126+8);
 
-	char my_db_secondary[16] = "my_db_secondary";
-	SHT_CreateSecondaryIndex(my_db_secondary, "surname", 25, 126+8, my_db);
+	char my_db_secondary[15] = "my_dbs";
+	if(SHT_CreateSecondaryIndex(my_db_secondary, "surname", 25, 126+8, my_db) < 0){
+		cout << "error at create secondary index" << endl;
+	}
 
 	HT_info* index = HT_OpenIndex(my_db);
 	SHT_info* secondary_index = SHT_OpenSecondaryIndex(my_db_secondary);
@@ -42,28 +44,30 @@ int main(){
 			SecondaryRecord t;
 			strcpy(t.surname, items[i].surname);
 			t.blockId = temp;
-			if(SHT_SecondaryInsertEntry(*secondary_index, t) < 0){
+			int tt = SHT_SecondaryInsertEntry(*secondary_index, t);
+			if(tt < 0){
 				cout << "There was an error in the insertion of Secondary entry " << items[i].id << endl;
 				return 1;
 			}
 		}
 	}
 
-	int entries_to_delete[] = {1, 18, 25, 62, 32, 116, 99, 442, 482};
-
+	char* entries_to_delete[] = {"surname_1", "surname_18", "surname_25", "surname_62", "surname_32", "surname_116", "surname_99", "surname_442", "surname_482"};
 	// Check if the entries exist.
-	for (auto entry : entries_to_delete)
+	for(int i=0; i<9; i++)
 	{
-		if (HT_GetAllEntries(*index, &entry) == -1)
+		if (SHT_SecondaryGetAllEntries(*secondary_index, *index, entries_to_delete[i]) == -1)
 		{
-			cout << "The entry: " << entry << " wasn't found." << endl;
+			cout << "The entry: " << entries_to_delete[i] << " wasn't found." << endl;
 			return 1;
+		}else{
+			cout << endl;
 		}
 	}
 
-	if(HashStatistics(my_db)<0){
-		cout << "Hash returned error" << endl;
-		return -1;
-	}
+	// if(HashStatistics(my_db)<0){
+	// 	cout << "Hash returned error" << endl;
+	// 	return -1;
+	// }
 	return 0;
 }
