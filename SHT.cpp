@@ -243,6 +243,7 @@ int SHT_HashStatistics(char* filename){
 
   int numBuckets =header_info_sht->numBuckets;
   int pl_blocks = (numBuckets / MAX_BUCKETS_IN_BLOCK)+ 1;
+  cout << pl_blocks << endl;
   int block_counter=1 + pl_blocks;//the block counter starts with one because we have the header block, and then we add the pl of blocks used by the hash table
 
   int array[numBuckets];//initialize this array so we can easily store the heap's addresses
@@ -282,12 +283,14 @@ int SHT_HashStatistics(char* filename){
   int max = temp;
   int average_records = 0;
   int average_blocks = 0;
+  int used_buckets = numBuckets;
   for(int i=0;i< numBuckets; i++){//for every bucket do every calculation to find the output
     heap = array[i];
     if(heap == 0){//if its 0 then we have an unused heap so skip it
+      used_buckets--;
       continue;
     }
-    int num = SHT_HP_GetBlockCounter(header_info_sht, heap);//here it goes into infinite loop
+    int num = SHT_HP_GetBlockCounter(header_info_sht, heap);
     int pl_records = SHT_HP_GetRecordCounter(header_info_sht, heap);
 
     block_counter += num;
@@ -301,10 +304,12 @@ int SHT_HashStatistics(char* filename){
     average_blocks += num;
     average_records += pl_records;
 
+    // cout << average_blocks << endl;
+
   }
-  cout << average_blocks <<  " " << numBuckets<< endl;
-  average_blocks = average_blocks/numBuckets;
-  average_records = average_records/numBuckets;
+  // cout << average_blocks <<  " " << numBuckets<< endl;
+  average_blocks = average_blocks/used_buckets;
+  average_records = average_records/used_buckets;
 
   //and print it
   cout << "Blocks used by file \"" << filename << "\": " << block_counter << endl;
@@ -339,13 +344,3 @@ int SHT_HashStatistics(char* filename){
 
   return 0;
 }
-
-
-
-// int HT_function(char* value, int buckets){//same as int but for characters
-//   unsigned int hash = 5381;
-//   for(char* s= value; *s != '\0'; s++){
-//     hash = (hash << 5) + hash + *s;
-//   }
-//   return hash % buckets;
-// }

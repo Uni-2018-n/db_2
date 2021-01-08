@@ -52,18 +52,18 @@ int main(){
 		}
 	}
 
-	const char* entries_to_delete[] = {"surname_1", "surname_18", "surname_25", "surname_62", "surname_32", "surname_116", "surname_99", "surname_442", "surname_482"};
-	// Check if the entries exist.
-	for(int i=0; i<9; i++)
-	{
-		if (SHT_SecondaryGetAllEntries(*secondary_index, *index, (char*)entries_to_delete[i]) == -1)
-		{
-			cout << "The entry: " << entries_to_delete[i] << " wasn't found." << endl;
-			return 1;
-		}else{
-			cout << endl;
-		}
-	}
+	// const char* entries_to_delete[] = {"surname_1", "surname_18", "surname_25", "surname_62", "surname_32", "surname_116", "surname_99", "surname_442", "surname_482"};
+	// // Check if the entries exist.
+	// for(int i=0; i<9; i++)
+	// {
+	// 	if (SHT_SecondaryGetAllEntries(*secondary_index, *index, (char*)entries_to_delete[i]) == -1)
+	// 	{
+	// 		cout << "The entry: " << entries_to_delete[i] << " wasn't found." << endl;
+	// 		return 1;
+	// 	}else{
+	// 		cout << endl;
+	// 	}
+	// }
 
 	HT_CloseIndex(index);
 	SHT_CloseSecondaryIndex(secondary_index);
