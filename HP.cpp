@@ -390,7 +390,6 @@ int HT_HP_GetAllEntries(HT_info* header_info, void* value, int heap_addr)
 
     curr_block_addr = ReadNextBlockAddr(block);
 	}
-	cout << "got nothing" << endl;
 	return -1;
 }
 

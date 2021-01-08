@@ -7,13 +7,14 @@ We have changed the file BF.h in the following ways:
 	* Added extern "C" in a #ifdef __cplusplus, in order for
 	the code to compile under g++.
 
+Απο εργασια 1:
 In the main.cpp file we chose to use the HT database, because, it uses some of the HP functions.
 
 When we create the databases (in both hp and ht),
 we write "HP" or "HT", in the start, so we can check if the file
 opened is valid for the database.
 
-HP.cpp	
+HP.cpp
 * The functions behave in the expected way.
 * There is a limit (15 characters) in the key's name,
 when we use HP_CreateFIle because we need to store it in a struct.
@@ -23,9 +24,9 @@ when we use HP_CreateFIle because we need to store it in a struct.
 which are very similar to the HP ones but also different because
 they are used for the hash based database.
 Because of that we need both HP and HT files for a successful compilation of a HT program and only HP files for a HP one.
-* Blocks are stored one after another in the file. 
-In the end of the block, 
-I write the number of Records that are inside the file and 
+* Blocks are stored one after another in the file.
+In the end of the block,
+I write the number of Records that are inside the file and
 the <address> of the the next block. (The address is mostly used to know if this is the last block in the heap.)
 * When I delete a Record in a block I swap it with the last one inside that block. (Except for the case that it is the only block)
 * If I delete all Records from a block, the block stays empty.
@@ -118,3 +119,26 @@ specific bucket and finally print the overflow sum.
 Because of the fact that this function is not an implementation of the hash
 table we thought that the file must be done with any processing and to be
 closed. So in this function we open and close the file.
+
+Απο Εργασια 2:
+For this practice we used the already implemented functions used for the Hash table
+and changed some minor stuff to make it work with the new record type. The only
+things needed to be changed was the variables that before was Record now changed
+into SecondaryRecord and every compare was made with the int id as key now needed
+to be change to the char surname.
+One major change was that the value that the HT_InsertEntry provided now is getting
+used by SHT_SecondaryInsertEntry so we can store the block id of the block that we
+just stored our record.
+Finally the last major change was inside SHT_HP_GetAllEntries now instead of
+just printing the information we pass it to SHT_HP_GetAllEntries_T so it will find
+the correct record inside the primary's block.
+
+Inside SHT_HashStatistics nothing really changed except that now we calculate the
+ statistics based on a SHT_info file. Opening and closing the HT_info file was
+ just for formality.
+
+All the helping functions created when implemented HT was recreated for SHT
+but now with diffrent record members and compared variables(if needed).
+
+Because of the fact that we've already implemented the HashFunction for chars
+we just used it from the HT file.

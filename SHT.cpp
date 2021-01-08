@@ -14,40 +14,31 @@ int SHT_CreateSecondaryIndex(const char* sfileName, const char* attrName, int at
     return -1;
   }
 
-
   int old_file = BF_OpenFile(fileName);
-  if (old_file < 0)
-      return -1;
-
+  if (old_file < 0){
+    return -1;
+  }
   void *block;
-  if (BF_ReadBlock(old_file, 0, &block) < 0)
-      return -1;
-
-
+  if (BF_ReadBlock(old_file, 0, &block) < 0){
+    return -1;
+  }
   // Check if the old file is HT.
   char type[3];
   memcpy(type, (char *)block, 3);
-  if (strcmp(type, "HT") != 0)
-      return -1;
+  if (strcmp(type, "HT") != 0){
+    return -1;
+  }
 
   if (BF_CreateFile(sfileName) < 0){
     return -1;
   }
-
   int new_file = BF_OpenFile(sfileName);
   if (new_file < 0){
-
     return -1;
   }
-
   if (BF_AllocateBlock(new_file) < 0){
     return -1;
   }
-
-  if (BF_ReadBlock(new_file, 0, &block) < 0){
-    return -1;
-  }
-
   if (BF_ReadBlock(new_file, 0, &block) < 0){
     return -1;
   }
@@ -69,6 +60,7 @@ int SHT_CreateSecondaryIndex(const char* sfileName, const char* attrName, int at
     if(BF_ReadBlock(new_file, BF_GetBlockCounter(new_file)-1, &block) < 0){
       return -1;
     }
+
     int max;
     if(i == pl_blocks-1){
       max = buckets - MAX_BUCKETS_IN_BLOCK*i;
@@ -80,15 +72,13 @@ int SHT_CreateSecondaryIndex(const char* sfileName, const char* attrName, int at
       int temp =0;
       memcpy((char*)block+ sizeof(int)*j, &temp, sizeof(int));
     }
+
     BF_WriteBlock(new_file, BF_GetBlockCounter(new_file)-1);
   }
-
-
 
   if (BF_CloseFile(new_file) < 0){
     return -1;
   }
-
   if (BF_CloseFile(old_file) < 0){
     return -1;
   }
@@ -102,15 +92,11 @@ SHT_info* SHT_OpenSecondaryIndex(char* sfileName){
     return nullptr;
   }
 
-
-
   SHT_info* info = new SHT_info;
-
   info->fileDesc = fd;
 
   void* block;
   if (BF_ReadBlock(fd, 0, &block) < 0){
-
     return nullptr;
   }
 
@@ -120,7 +106,6 @@ SHT_info* SHT_OpenSecondaryIndex(char* sfileName){
   if (strcmp(type, "SHT") != 0){
     return nullptr;
   }
-
 
   memcpy(&(info->attrLength), (char *)block + 4, sizeof(int));
   memcpy(&(info->attrName), (char *)block + 4 + sizeof(int), MAX_NAME_SIZE);
@@ -166,33 +151,29 @@ int SHT_SecondaryInsertEntry(SHT_info header_info, SecondaryRecord record){
         found =1;
         break;
       }
+
       counter++;
     }
     if(found){
       break;
     }
-
   }
 
-  int new_heap_addr = SHT_HP_InsertEntry(&header_info, &record, heap); //then pass it to HT_HP_InsertEntry to add it into the heap's blocks
+  int new_heap_addr = SHT_HP_InsertEntry(&header_info, &record, heap);
   if (new_heap_addr == -1){
     return -1;
   }
-  if (new_heap_addr != heap){ //if the heap was empty the upper loop returned the int heap variable as 0 so we need to set the new address returned by HT_HP_InsertEntry
+
+  if (new_heap_addr != heap){
     memcpy((char*)block +sizeof(int)*j, &new_heap_addr, sizeof(int));
-    BF_WriteBlock(header_info.fileDesc, i+1); //and save changed
+    BF_WriteBlock(header_info.fileDesc, i+1);
   }
-  return 0;
-
-
 
   return 0;
 }
 
 int SHT_SecondaryGetAllEntries(SHT_info header_info_sht, HT_info header_info_ht, void *value){
-  int h;//again same implementation as above
-  h = HT_function((char*)value, (int)header_info_sht.numBuckets);
-
+  int h = HT_function((char*)value, (int)header_info_sht.numBuckets);
   void* block;
   int heap;
   int j;
@@ -200,6 +181,7 @@ int SHT_SecondaryGetAllEntries(SHT_info header_info_sht, HT_info header_info_ht,
   int counter=0;
   int pl_blocks = (header_info_sht.numBuckets / MAX_BUCKETS_IN_BLOCK)+ 1;
   int block_counter = 0;
+
   for(i=0;i<pl_blocks;i++){
     block_counter++;
     if(BF_ReadBlock(header_info_sht.fileDesc, i+1, &block) <0){
@@ -207,12 +189,13 @@ int SHT_SecondaryGetAllEntries(SHT_info header_info_sht, HT_info header_info_ht,
     }
 
     int max;
-    heap=0;
     if(i == pl_blocks-1){
       max = header_info_sht.numBuckets - MAX_BUCKETS_IN_BLOCK*i;
     }else{
       max = MAX_BUCKETS_IN_BLOCK;
     }
+
+    heap=0;
     int found =0;
     for(j=0;j<max;j++){
       if(counter == h){
@@ -225,16 +208,14 @@ int SHT_SecondaryGetAllEntries(SHT_info header_info_sht, HT_info header_info_ht,
     if(found){
       break;
     }
-
   }
 
-  //call the function to print the entry and return the blocks searched to find the entry.
   int result = SHT_HP_GetAllEntries(&header_info_sht, &header_info_ht, value, heap);
-
-  if (result == -1)
+  if (result == -1){
     return -1;
-  else
-    return block_counter + result;
+  }
+
+  return block_counter + result;
 }
 
 int SHT_HashStatistics(char* filename){
@@ -243,57 +224,55 @@ int SHT_HashStatistics(char* filename){
 
   int numBuckets =header_info_sht->numBuckets;
   int pl_blocks = (numBuckets / MAX_BUCKETS_IN_BLOCK)+ 1;
-  cout << pl_blocks << endl;
-  int block_counter=1 + pl_blocks;//the block counter starts with one because we have the header block, and then we add the pl of blocks used by the hash table
+  int block_counter=1 + pl_blocks;
 
-  int array[numBuckets];//initialize this array so we can easily store the heap's addresses
+  int array[numBuckets];
 
   void* block;
   int heap;
   int j;
   int i;
   int counter=0;
-
-  for(i=0;i<pl_blocks;i++){//as above for each block read it and go through its buckets
+  for(i=0;i<pl_blocks;i++){
     if(BF_ReadBlock(header_info_sht->fileDesc, i+1, &block) <0){
       return -1;
     }
 
     int max;
-    heap=0;
     if(i == pl_blocks-1){
       max = header_info_sht->numBuckets - MAX_BUCKETS_IN_BLOCK*i;
     }else{
       max = MAX_BUCKETS_IN_BLOCK;
     }
+
+    heap=0;
     for(j=0;j<max;j++){
-        memcpy(&heap, (char *)block + sizeof(int)*j, sizeof(int));
-        array[counter] = heap;//store the heap into the array
+      memcpy(&heap, (char *)block + sizeof(int)*j, sizeof(int));
+      array[counter] = heap;
       counter++;
     }
   }
 
-  //we used an array here because inside HT_HP_* functions we have BF_ReadBlock function that changes the void* block data so its not possible for us to have the correct one
+
   int k=0;
   while(array[k] == 0){
     k++;
   }
   int temp = SHT_HP_GetRecordCounter(header_info_sht, array[k]);
-  int min = temp;//help variables to calculate min, max and averages
+  int min = temp;
   int max = temp;
   int average_records = 0;
   int average_blocks = 0;
-  int used_buckets = numBuckets;
-  for(int i=0;i< numBuckets; i++){//for every bucket do every calculation to find the output
+  int used_buckets = numBuckets;//used this so no empty buckets will be calculated in the averages
+  for(int i=0;i< numBuckets; i++){
     heap = array[i];
-    if(heap == 0){//if its 0 then we have an unused heap so skip it
+    if(heap == 0){
       used_buckets--;
       continue;
     }
+
     int num = SHT_HP_GetBlockCounter(header_info_sht, heap);
     int pl_records = SHT_HP_GetRecordCounter(header_info_sht, heap);
-
-    block_counter += num;
 
     if(pl_records < min){
       min = pl_records;
@@ -301,17 +280,14 @@ int SHT_HashStatistics(char* filename){
     if(pl_records > max){
       max = pl_records;
     }
+
+    block_counter += num;
     average_blocks += num;
     average_records += pl_records;
-
-    // cout << average_blocks << endl;
-
   }
-  // cout << average_blocks <<  " " << numBuckets<< endl;
   average_blocks = average_blocks/used_buckets;
   average_records = average_records/used_buckets;
 
-  //and print it
   cout << "Blocks used by file \"" << filename << "\": " << block_counter << endl;
   cout << "Minimum records per bucket: " << min << endl;
   cout << "Maximum records per bucket: " << max << endl;
@@ -319,25 +295,22 @@ int SHT_HashStatistics(char* filename){
 
   cout << "Average number of blocks per bucket: " << average_blocks << endl;
 
-
-  cout << "Overflow blocks: " << endl;//same thing with overflow
+  cout << "Overflow blocks: " << endl;
   int overflow=0;
   for(int i=0;i<numBuckets;i++){
     int heap;
     heap = array[i];
     int num = SHT_HP_GetBlockCounter(header_info_sht, heap);
-    if(num > 1){//if the num is > 1 it means that there is an overflow happening
+    if(num > 1){
       overflow += num-1;
       cout << "For bucket " << i << ", " << num-1 << endl;
     }
   }
   cout << "Overflow sum: " << overflow << endl;
 
-
   if(HT_CloseIndex(header_info_ht) <0){
     return -1;
   }
-
   if(SHT_CloseSecondaryIndex(header_info_sht) < 0){
     return -1;
   }
