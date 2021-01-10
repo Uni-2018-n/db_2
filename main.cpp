@@ -50,13 +50,23 @@ int main(){
 		}
 	}
 
-	const char* entries_to_delete[] = {"surname_1", "surname_18", "surname_25", "surname_62", "surname_32", "surname_116", "surname_99", "surname_442", "surname_482"};
+	int ht_entries_to_check[] = {1, 18, 25, 62, 32, 116, 99, 442, 482};
+	const char* sht_entries_to_check[] = {"surname_1", "surname_18", "surname_25", "surname_62", "surname_32", "surname_116", "surname_99", "surname_442", "surname_482"};
 	// Check if the entries exist.
 	for(int i=0; i<9; i++){
-		if (SHT_SecondaryGetAllEntries(*secondary_index, *index, (char*)entries_to_delete[i]) == -1){
-			cout << "The entry: " << entries_to_delete[i] << " wasn't found." << endl;
+		if (SHT_SecondaryGetAllEntries(*secondary_index, *index, (char *)sht_entries_to_check[i]) == -1){
+			cout << "SHT-> The entry: " << sht_entries_to_check[i] << " wasn't found." << endl;
 			return 1;
 		}else{
+			cout << endl;
+		}
+
+		if (HT_GetAllEntries(*index, &(ht_entries_to_check[i])) == -1)
+		{
+			cout << "HT-> The entry: " << ht_entries_to_check[i] << " wasn't found." << endl;
+			return 1;
+		}
+		else{
 			cout << endl;
 		}
 	}
