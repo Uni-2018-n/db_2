@@ -64,7 +64,7 @@ int main()
 	HT_info* index = HT_OpenIndex(my_db);
 	SHT_info* secondary_index = SHT_OpenSecondaryIndex(my_db_secondary);
 
-	FILE* fp = fopen("records/records5K.txt", "r");
+	FILE* fp = fopen("records/records0K.txt", "r");
 	if (fp == NULL)
 		return 1;
 
@@ -99,6 +99,9 @@ int main()
 			}
 		}
 	}
+
+	const char buf[] = "surname_0";
+	SHT_SecondaryGetAllEntries(*secondary_index, *index, (char *) buf);
 
 	int ht_entries_to_check[] = {4999, 1, 18, 25, 62, 32, 116, 99, 442};
 	const char* sht_entries_to_check[] = {"surname_4999", "surname_1", "surname_18", "surname_25", "surname_62", "surname_32", "surname_116", "surname_99", "surname_442"};

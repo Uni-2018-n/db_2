@@ -40,7 +40,7 @@ int SHT_HP_InsertEntry(SHT_info* header_info, SecondaryRecord* record, int heap_
 			curr_block_addr = BF_GetBlockCounter(header_info->fileDesc) - 1;
 		}
 
-		if (SHT_IsKeyInBlock(record, block) > -1){
+		if (SHT_IsKeyInBlock(record, block, 0) > -1){
 			return -1;
 		}
 
@@ -92,6 +92,8 @@ int SHT_HP_GetAllEntries(SHT_info* header_info_sht, HT_info* header_info_ht, voi
 	SecondaryRecord record;
   int counter = 0; // Counts how many blocks were read until we found the key.
 
+  bool found = false;
+
   while (curr_block_addr != -1){
     counter++;
 
@@ -102,15 +104,24 @@ int SHT_HP_GetAllEntries(SHT_info* header_info_sht, HT_info* header_info_ht, voi
 			return 1;
 		}
 
-		int record_pos = SHT_IsKeyInBlock(&record, block);
-		if (record_pos > -1){//incase we've found the record
+		int record_pos;
+		int last_pos = 0;
+
+		while ((record_pos = SHT_IsKeyInBlock(&record, block, last_pos)) != -1)
+		{
 			SHT_ReadRecord(block, record_pos, &record);
-      HT_HP_GetAllEntries_T(header_info_ht, value, record.blockId);//pass it to an HT_HP function so it will know what to do with it
-			return counter;
+      		HT_HP_GetAllEntries_T(header_info_ht, value, record.blockId);//pass it to an HT_HP function so it will know what to do with it
+
+			found = true;
+			last_pos = record_pos + 1;
 		}
 
 		curr_block_addr = ReadNextBlockAddr(block);
 	}
+
+	if (found == true)
+		return counter;
+
 	return -1;
 }
 
@@ -192,10 +203,10 @@ int SHT_HP_GetBlockCounter(SHT_info* header_info, int heap_addr){
 }
 
 
-int SHT_IsKeyInBlock(SecondaryRecord* record, void* block){
+int SHT_IsKeyInBlock(SecondaryRecord* record, void* block, int last_pos){
 	int num_of_records = ReadNumOfRecords(block);
 	SecondaryRecord tmp_record;
-	for (int i = 0; i < num_of_records; i++){
+	for (int i = last_pos; i < num_of_records; i++){
 		SHT_ReadRecord(block, i, &tmp_record);
     if(strcmp(record->surname, tmp_record.surname) == 0){
       return i;
