@@ -53,15 +53,6 @@ void ReadRecord(char* buffer, Record& my_record)
 
 int main()
 {
-	Record items[NUM_OF_ENTRIES];
-	for(int i=0;i<NUM_OF_ENTRIES;i++)
-	{
-		items[i].id = i;
-		sprintf(items[i].name, "name_%d", i);
-		sprintf(items[i].surname, "surname_%d", i);
-		sprintf(items[i].address, "address_%d", i);
-	}
-
 	char my_db[15] = "my_dbp";
 	HT_CreateIndex(my_db, 'i', "id", 14, 126+8);
 
@@ -80,15 +71,9 @@ int main()
 	char *buffer = NULL;
 	size_t max_len = 128;
 
-	int line = 0;
-
 	// Read file line, by line.
 	while (getline(&buffer, &max_len, fp) != -1)
 	{
-		line++;
-
-		// cout << "Line: " << line - 1 << endl;
-
 		Record my_record;
 
 		// Read line and copy contents to my_record.
@@ -112,29 +97,8 @@ int main()
 				cout << "There was an error in the insertion of Secondary entry " << my_record.id << endl;
 				return 1;
 			}
-
-			// I try to find every previous entry.
-			// for (int i = 0; i < line; i++)
-			// {
-			// 	// if (HT_GetAllEntries(*index, &(items[i].id)) == -1)
-			// 	if (SHT_SecondaryGetAllEntries(*secondary_index, *index, (char *) items[i].surname) == -1)
-			// 	{
-			// 		cout << "There was an error, with entry: " << items[i].id << endl;
-			// 		return 1;
-			// 	}
-			// }
-			// if (SHT_SecondaryGetAllEntries(*secondary_index, *index, (char *) t.surname) == -1)
-			// {
-			// 	cout << "There was an error!" << endl;
-			// 	return 1;
-			// }
-
-			int p = 3;
 		}
 	}
-
-	// const char buf[] = "surname_0";
-	// SHT_SecondaryGetAllEntries(*secondary_index, *index, (char *) buf);
 
 	int ht_entries_to_check[] = {1, 18, 25, 62, 32, 116, 99, 442};
 	const char* sht_entries_to_check[] = {"surname_1", "surname_18", "surname_25", "surname_62", "surname_32", "surname_116", "surname_99", "surname_442"};
