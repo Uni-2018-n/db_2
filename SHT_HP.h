@@ -12,7 +12,7 @@ int SHT_HP_GetRecordCounter(SHT_info* header_info, int heap_addr);
 int SHT_HP_GetBlockCounter(SHT_info* header_info, int heap_addr);
 
 int SHT_IsKeyInBlock(SecondaryRecord* record, void* block, int last_pos);
-int SHT_IsKeyInBlock_T(Record* record, void* block);
+int SHT_IsKeyInBlock_T(Record* record, void* block, int last_pos);
 int SHT_AssignKeyToRecord(SecondaryRecord* record, void* value);
 int SHT_AssignKeyToRecord_T(Record* record, void* value);
 void SHT_WriteRecord(void* block, int recordNumber, const SecondaryRecord* record);

@@ -559,6 +559,6 @@ int HT_HP_InsertEntry(HT_info* header_info, Record* record, int heap_address)
     curr_block_addr = next_block_addr;
 	}
 
-	return heap_address;
-	// return curr_block_addr;
+	// return heap_address;
+	return curr_block_addr;
 }

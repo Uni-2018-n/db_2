@@ -40,8 +40,15 @@ int SHT_HP_InsertEntry(SHT_info* header_info, SecondaryRecord* record, int heap_
 			curr_block_addr = BF_GetBlockCounter(header_info->fileDesc) - 1;
 		}
 
-		if (SHT_IsKeyInBlock(record, block, 0) > -1){
-			return -1;
+		int record_pos;
+
+		if ((record_pos = SHT_IsKeyInBlock(record, block, 0)) > -1)
+		{	
+			SecondaryRecord temp_rec;
+			SHT_ReadRecord(block, record_pos, &temp_rec);
+
+			if (record->blockId == temp_rec.blockId)
+				return curr_block_addr;
 		}
 
 		next_block_addr = ReadNextBlockAddr(block);
@@ -80,7 +87,7 @@ int SHT_HP_InsertEntry(SHT_info* header_info, SecondaryRecord* record, int heap_
 
     curr_block_addr = next_block_addr;
 	}
-	return heap_address;
+	return curr_block_addr;
 }
 
 int SHT_HP_GetAllEntries(SHT_info* header_info_sht, HT_info* header_info_ht, void* value, int heap_addr){
@@ -135,6 +142,8 @@ int HT_HP_GetAllEntries_T(HT_info* header_info, void* value, int heap_addr){
 	Record record;
   int counter = 0; // Counts how many blocks were read until we found the key.
 
+  bool found = false;
+
   while (curr_block_addr != -1){
     counter++;
 
@@ -145,8 +154,11 @@ int HT_HP_GetAllEntries_T(HT_info* header_info, void* value, int heap_addr){
 			return 1;
 		}
 
-		int record_pos = SHT_IsKeyInBlock_T(&record, block); //change this for value is a char
-		if (record_pos > -1){
+		int record_pos;
+		int last_pos = 0;
+
+		while ((record_pos = SHT_IsKeyInBlock_T(&record, block, last_pos)) != -1)
+		{
 			ReadRecord(block, record_pos, &record);
 			std::cout << "id: " << record.id
 					  << "\nname: " << record.name
@@ -154,11 +166,16 @@ int HT_HP_GetAllEntries_T(HT_info* header_info, void* value, int heap_addr){
 					  << "\naddress: " << record.address
 					  << std::endl;
 
-			return counter;
+			found = true;
+			last_pos = record_pos + 1;
 		}
 
     curr_block_addr = ReadNextBlockAddr(block);
 	}
+
+	if (found)
+		return counter;
+
 	return -1;
 }
 
@@ -215,10 +232,10 @@ int SHT_IsKeyInBlock(SecondaryRecord* record, void* block, int last_pos){
 	return -1;
 }
 
-int SHT_IsKeyInBlock_T(Record* record, void* block){//used incase we need to find a record inside an HT block but we need to search it with the surname
+int SHT_IsKeyInBlock_T(Record* record, void* block, int last_pos){//used incase we need to find a record inside an HT block but we need to search it with the surname
 	int num_of_records = ReadNumOfRecords(block);
 	Record tmp_record;
-	for (int i = 0; i < num_of_records; i++){
+	for (int i = last_pos; i < num_of_records; i++){
 		ReadRecord(block, i, &tmp_record);
     if(strcmp(record->surname, tmp_record.surname) == 0){
       return i;
