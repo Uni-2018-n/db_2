@@ -49,6 +49,9 @@ int SHT_HP_InsertEntry(SHT_info* header_info, SecondaryRecord* record, int heap_
 
 			if (record->blockId == temp_rec.blockId)
 				return curr_block_addr;
+
+			cout << "Exit";
+			exit(0);
 		}
 
 		next_block_addr = ReadNextBlockAddr(block);
@@ -87,7 +90,7 @@ int SHT_HP_InsertEntry(SHT_info* header_info, SecondaryRecord* record, int heap_
 
     curr_block_addr = next_block_addr;
 	}
-	return curr_block_addr;
+	return heap_address;
 }
 
 int SHT_HP_GetAllEntries(SHT_info* header_info_sht, HT_info* header_info_ht, void* value, int heap_addr){
@@ -150,7 +153,7 @@ int HT_HP_GetAllEntries_T(HT_info* header_info, void* value, int heap_addr){
 		if (BF_ReadBlock(header_info->fileDesc, curr_block_addr, &block) != 0){
 			return -1;
 		}
-		if (SHT_AssignKeyToRecord_T(&record, value) != 0){ // change this for value is a char
+		if (SHT_AssignKeyToRecord_T(&record, value) != 0){
 			return 1;
 		}
 
