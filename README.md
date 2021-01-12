@@ -133,6 +133,15 @@ Finally the last major change was inside SHT_HP_GetAllEntries now instead of
 just printing the information we pass it to SHT_HP_GetAllEntries_T so it will find
 the correct record inside the primary's block.
 
+We have implemented a way to insert and store multiple entries with the same surname.
+When someone wants to insert a record, we check to see if that surname is already in the
+SHT database. If it isn't we insert the record. If it is we check if the new record has 
+the same block_id with the record that is already in the database. If not we insert the
+new record.
+
+To be sure that we didn't miss anyone when searching the database for the surname of someone,
+we check every person inside a (HT) block, and we don't stop when we find someone.
+
 Inside SHT_HashStatistics nothing really changed except that now we calculate the
  statistics based on a SHT_info file. Opening and closing the HT_info file was
  just for formality.
